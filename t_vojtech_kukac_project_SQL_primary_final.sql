@@ -14,4 +14,8 @@ LEFT JOIN czechia_price_category AS cz_pc
 	ON cz_pc.code = cz_p.category_code
 LEFT JOIN czechia_payroll_industry_branch AS cz_pay_in_br
 	ON cz_pay.industry_branch_code = cz_pay_in_br.code
+WHERE 
+	cz_pay.value IS NOT NULL AND 
+	cz_pay.value_type_code = 5958 AND 
+	cz_pay_in_br.name IS NOT NULL
 ;
