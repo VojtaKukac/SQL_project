@@ -61,3 +61,46 @@ ORDER BY
 -- 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
 
 -- 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
+
+CREATE OR REPLACE VIEW v_gdp_growth AS
+SELECT 
+	*,
+	LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year) Next_year_GDP,
+	round((((LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year))-GDP) / GDP ) * 100,2) GDP_growth
+FROM 
+	t_vojtech_kukac_project_SQL_secondary_final
+WHERE 
+	country = LOWER("czech republic");
+
+
+CREATE OR REPLACE VIEW v_cz_price_growth AS
+SELECT 
+	Year_price, 
+	ROUND(AVG(Difference),2) AS Difference 
+FROM 
+	v_cz_price_difference 
+GROUP BY 
+	Year_price;
+
+CREATE OR REPLACE VIEW v_cz_payllor_growth AS
+SELECT 
+	Year_price, 
+	ROUND(AVG(Growth),2) AS Growth 
+FROM 
+	v_select_cz_payllor_growth 
+GROUP BY 
+	Year_price;
+
+SELECT 
+	v_gdp.YEAR AS Basic_year,
+	v_gdp.YEAR + 1 AS Next_year,
+	v_gdp.GDP_growth,
+	v_cz_p.Difference AS Price_growth,
+	v_cz_pay.Growth AS Pay_growth
+FROM 
+	v_gdp_growth AS v_gdp
+LEFT JOIN v_cz_price_growth AS v_cz_p
+	ON v_gdp.`year`= v_cz_p.Year_price
+LEFT JOIN v_cz_payllor_growth AS v_cz_pay
+	ON v_gdp.`year`= v_cz_pay.Year_price
+WHERE v_gdp.YEAR >= 2006 AND v_gdp.YEAR <= 2017 ;
