@@ -60,6 +60,31 @@ ORDER BY
 
 -- 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
 
+CREATE OR REPLACE VIEW v_cz_price_growth AS
+SELECT 
+	Year_price, 
+	ROUND(AVG(Difference),2) AS Difference 
+FROM v_cz_price_difference 
+GROUP BY Year_price;
+
+CREATE OR REPLACE VIEW v_cz_payllor_growth AS
+SELECT 
+	Year_price, 
+	ROUND(AVG(Growth),2) AS Growth 
+FROM v_select_cz_payllor_growth 
+GROUP BY Year_price;
+
+SELECT 
+	v_cz_p.Year_price,
+	v_cz_p.Difference AS Price_growth,
+	v_cz_pay.Growth AS Pay_growth,
+	v_cz_p.Difference - v_cz_pay.Growth AS Difference_price_pay
+FROM 
+	v_cz_price_growth AS v_cz_p
+LEFT JOIN v_cz_payllor_growth AS v_cz_pay
+	ON v_cz_p.Year_price = v_cz_pay.Year_price
+ORDER BY Difference_price_pay;
+
 -- 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 
 CREATE OR REPLACE VIEW v_gdp_growth AS
