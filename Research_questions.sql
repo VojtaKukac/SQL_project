@@ -27,10 +27,12 @@ ORDER BY Industry_branch,Year_price;
 
 SELECT
 	Industry_branch,
-	Round(AVG(Growth),2)
+	Round(AVG(Growth),2) AS Pay_growth
 FROM v_select_cz_payllor_growth
 WHERE Growth IS NOT NULL
 GROUP BY Industry_branch;
+
+-- Ve sloupci "Pay_growth" je možné vidět, že celkově ve všech odvětvích mzda v průběhu let roste.
 
 -- 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd?
 
@@ -60,6 +62,9 @@ SELECT
 FROM 
 	v_select_year_category;
 
+-- V roce 2006 si za průměrnou mzdu bylo možné koupit 1 287,16 kg chleba nebo 1 437,46 litrů mléka.
+-- V roce 2018 si za průměrnou mzdu bylo možné koupit 1 342,32 kg chleba nebo 1 641,77 litrů mléka.
+
 -- 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
 
 CREATE OR REPLACE VIEW v_cz_price_difference AS
@@ -83,6 +88,8 @@ GROUP BY
 	Category
 ORDER BY 
 	AVG (Difference);
+
+-- Z dat je možné vypozorovat, že nejpomaleji zdražující kategorie potravin je kategorie Cukr krystal.
 
 -- 4. Existuje rok, ve kterém byl meziroční nárůst cen potravin výrazně vyšší než růst mezd (větší než 10 %)?
 
@@ -110,6 +117,9 @@ FROM
 LEFT JOIN v_cz_payllor_growth AS v_cz_pay
 	ON v_cz_p.Year_price = v_cz_pay.Year_price
 ORDER BY Difference_price_pay;
+
+-- V žádném roce nebyl nárůst cen potravit vyšší než 10%. 
+-- V roce 2012 byl nejvyšší nárus cen oporit nárůstu mezd a to bylo 9,22%.
 
 -- 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 
@@ -155,3 +165,5 @@ LEFT JOIN v_cz_price_growth AS v_cz_p
 LEFT JOIN v_cz_payllor_growth AS v_cz_pay
 	ON v_gdp.`year`= v_cz_pay.Year_price
 WHERE v_gdp.YEAR >= 2006 AND v_gdp.YEAR <= 2017 ;
+
+-- Z dat vyplívá, že výška HDP nemá přímí vliv na růst mezd nebo cen potravit.
