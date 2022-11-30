@@ -34,6 +34,32 @@ GROUP BY Industry_branch;
 
 -- 2. Kolik je možné si koupit litrů mléka a kilogramů chleba za první a poslední srovnatelné období v dostupných datech cen a mezd?
 
+CREATE OR REPLACE VIEW v_select_year_category AS
+SELECT
+	AVG(Price) AS Avg_price,
+	AVG(Pay_value) AS Avg_pay,
+	Category,
+	Quantity,
+	Unit,
+	Year_price
+FROM 
+	t_vojtech_kukac_project_SQL_primary_final
+WHERE 
+	Year_price IN (2006,2018) AND 
+	Category IN ("Chléb konzumní kmínový","Mléko polotučné pasterované")
+GROUP BY 
+	Year_price, Category;
+	
+SELECT 
+	Avg_price,
+	Avg_pay,
+ 	Category,
+ 	Year_price,
+	ROUND(Avg_pay / Avg_price,2) AS Quantity_goods,
+	Unit
+FROM 
+	v_select_year_category;
+
 -- 3. Která kategorie potravin zdražuje nejpomaleji (je u ní nejnižší percentuální meziroční nárůst)?
 
 CREATE OR REPLACE VIEW v_cz_price_difference AS
