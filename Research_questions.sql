@@ -119,7 +119,7 @@ LEFT JOIN v_cz_payllor_growth AS v_cz_pay
 ORDER BY Difference_price_pay;
 
 -- V žádném roce nebyl nárůst cen potravit vyšší než 10%. 
--- V roce 2012 byl nejvyšší nárus cen oporit nárůstu mezd a to bylo 9,22%.
+-- V roce 2012 byl nejvyšší nárůst cen oporit nárůstu mezd a to bylo 9,22%.
 
 -- 5. Má výška HDP vliv na změny ve mzdách a cenách potravin? Neboli, pokud HDP vzroste výrazněji v jednom roce, projeví se to na cenách potravin či mzdách ve stejném nebo násdujícím roce výraznějším růstem?
 
@@ -166,4 +166,4 @@ LEFT JOIN v_cz_payllor_growth AS v_cz_pay
 	ON v_gdp.`year`= v_cz_pay.Year_price
 WHERE v_gdp.YEAR >= 2006 AND v_gdp.YEAR <= 2017 ;
 
--- Z dat vyplívá, že výška HDP nemá přímí vliv na růst mezd nebo cen potravit.
+-- Z dat vyplývá, že výška HDP nemá přímý vliv na růst mezd nebo cen potravit.
