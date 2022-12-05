@@ -1,12 +1,12 @@
 CREATE OR REPLACE TABLE t_vojtech_kukac_project_SQL_primary_final AS 
 SELECT 
-	cz_p.value AS Price,
-	cz_pc.name AS Category,
-	cz_pc.price_value AS Quantity,
-	cz_pc.price_unit AS Unit,
-	YEAR(cz_p.date_to) AS Year_price,
-	cz_pay.value AS Pay_value,
-	cz_pay_in_br.name AS Industry_branch
+	cz_p.value AS price,
+	cz_pc.name AS category,
+	cz_pc.price_value AS quantity,
+	cz_pc.price_unit AS unit,
+	YEAR(cz_p.date_to) AS year_price,
+	cz_pay.value AS pay_value,
+	cz_pay_in_br.name AS industry_branch
 FROM czechia_price AS cz_p
 JOIN czechia_payroll AS cz_pay
 	ON YEAR(cz_p.date_from) = cz_pay.payroll_year
