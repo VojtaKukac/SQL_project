@@ -2,35 +2,35 @@
 
 CREATE OR REPLACE VIEW v_select_cz_payllor AS 
 SELECT 
-	Year_price,
-	Industry_branch,
-	Pay_value
+	year_price,
+	industry_branch,
+	pay_value
 FROM 
 	t_vojtech_kukac_project_SQL_primary_final
 GROUP BY 
-	Year_price,
-	Industry_branch
+	year_price,
+	industry_branch
 ORDER BY 
-	Industry_branch,
-	Year_price;
+	industry_branch,
+	year_price;
 	
 CREATE OR REPLACE VIEW v_select_cz_payllor_growth AS
 SELECT 
-	Year_price,
-	Industry_branch,
-	Pay_value,
-	LEAD (Pay_value,1) OVER (PARTITION BY Industry_branch ORDER BY Industry_branch, Year_price) Next_pay_value,
-	ROUND ((((LEAD (Pay_value,1) OVER (PARTITION BY Industry_branch ORDER BY Industry_branch, Year_price)) - Pay_value) / Pay_value) * 100,2) AS Growth
+	year_price,
+	industry_branch,
+	pay_value,
+	LEAD (pay_value,1) OVER (PARTITION BY industry_branch ORDER BY industry_branch, year_price) next_pay_value,
+	ROUND ((((LEAD (pay_value,1) OVER (PARTITION BY industry_branch ORDER BY industry_branch, year_price)) - pay_value) / pay_value) * 100,2) AS growth
 FROM
 	v_select_cz_payllor
-ORDER BY Industry_branch,Year_price;
+ORDER BY industry_branch,year_price;
 
 SELECT
-	Industry_branch,
-	ROUND(AVG(Growth),2) AS Pay_growth
+	industry_branch,
+	ROUND(AVG(growth),2) AS pay_growth
 FROM v_select_cz_payllor_growth
-WHERE Growth IS NOT NULL
-GROUP BY Industry_branch;
+WHERE growth IS NOT NULL
+GROUP BY industry_branch;
 
 -- Ve sloupci "Pay_growth" je možné vidět, že celkově ve všech odvětvích mzda v průběhu let roste.
 
@@ -38,27 +38,27 @@ GROUP BY Industry_branch;
 
 CREATE OR REPLACE VIEW v_select_year_category AS
 SELECT
-	AVG(Price) AS Avg_price,
-	AVG(Pay_value) AS Avg_pay,
-	Category,
-	Quantity,
-	Unit,
-	Year_price
+	AVG(price) AS avg_price,
+	AVG(pay_value) AS avg_pay,
+	category,
+	quantity,
+	unit,
+	year_price
 FROM 
 	t_vojtech_kukac_project_SQL_primary_final
 WHERE 
-	Year_price IN (2006,2018) AND 
-	Category IN ("Chléb konzumní kmínový","Mléko polotučné pasterované")
+	year_price IN (2006,2018) AND 
+	category IN ("Chléb konzumní kmínový","Mléko polotučné pasterované")
 GROUP BY 
-	Year_price, Category;
+	year_price, category;
 	
 SELECT 
-	Avg_price,
-	Avg_pay,
- 	Category,
- 	Year_price,
-	ROUND(Avg_pay / Avg_price,2) AS Quantity_goods,
-	Unit
+	avg_price,
+	avg_pay,
+ 	category,
+ 	year_price,
+	ROUND(avg_pay / avg_price,2) AS quantity_goods,
+	unit
 FROM 
 	v_select_year_category;
 
@@ -69,25 +69,25 @@ FROM
 
 CREATE OR REPLACE VIEW v_cz_price_difference AS
 SELECT 
-	Year_price,
-	Category,
-	Price,
-	LEAD (Price,1) OVER (PARTITION BY Category ORDER BY Category, Year_price) Next_year_price,
-	ROUND ((((LEAD (Price,1) OVER (PARTITION BY Category  ORDER BY Category, Year_price)) - Price) / Price) * 100,2) Difference
+	year_price,
+	category,
+	price,
+	LEAD (price,1) OVER (PARTITION BY category ORDER BY category, year_price) next_year_price,
+	ROUND ((((LEAD (price,1) OVER (PARTITION BY category  ORDER BY category, year_price)) - price) / price) * 100,2) difference
 FROM 
 	t_vojtech_kukac_project_sql_primary_final
 GROUP BY 
-	Category, Year_price;
+	category, year_price;
 			
 SELECT 
-	Category,  
-	ROUND(AVG (Difference),2)
+	category,  
+	ROUND(AVG (difference),2)
 FROM 
 	v_cz_price_difference
 GROUP BY
-	Category
+	category
 ORDER BY 
-	AVG (Difference);
+	AVG (difference);
 
 -- Z dat je možné vypozorovat, že nejpomaleji zdražující kategorie potravin je kategorie Cukr krystal.
 
@@ -95,28 +95,28 @@ ORDER BY
 
 CREATE OR REPLACE VIEW v_cz_price_growth AS
 SELECT 
-	Year_price, 
-	ROUND(AVG(Difference),2) AS Difference 
+	year_price, 
+	ROUND(AVG(difference),2) AS difference 
 FROM v_cz_price_difference 
-GROUP BY Year_price;
+GROUP BY year_price;
 
 CREATE OR REPLACE VIEW v_cz_payllor_growth AS
 SELECT 
-	Year_price, 
-	ROUND(AVG(Growth),2) AS Growth 
+	year_price, 
+	ROUND(AVG(growth),2) AS growth 
 FROM v_select_cz_payllor_growth 
-GROUP BY Year_price;
+GROUP BY year_price;
 
 SELECT 
-	v_cz_p.Year_price,
-	v_cz_p.Difference AS Price_growth,
-	v_cz_pay.Growth AS Pay_growth,
-	v_cz_p.Difference - v_cz_pay.Growth AS Difference_price_pay
+	v_cz_p.year_price,
+	v_cz_p.difference AS price_growth,
+	v_cz_pay.growth AS pay_growth,
+	v_cz_p.difference - v_cz_pay.growth AS difference_price_pay
 FROM 
 	v_cz_price_growth AS v_cz_p
 LEFT JOIN v_cz_payllor_growth AS v_cz_pay
-	ON v_cz_p.Year_price = v_cz_pay.Year_price
-ORDER BY Difference_price_pay;
+	ON v_cz_p.year_price = v_cz_pay.year_price
+ORDER BY difference_price_pay;
 
 -- V žádném roce nebyl nárůst cen potravit vyšší než 10%. 
 -- V roce 2012 byl nejvyšší nárůst cen oporit nárůstu mezd a to bylo 9,22%.
@@ -126,7 +126,7 @@ ORDER BY Difference_price_pay;
 CREATE OR REPLACE VIEW v_gdp_growth AS
 SELECT 
 	*,
-	LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year) Next_year_GDP,
+	LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year) next_year_GDP,
 	ROUND((((LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year))-GDP) / GDP ) * 100,2) GDP_growth
 FROM 
 	t_vojtech_kukac_project_SQL_secondary_final
@@ -136,34 +136,34 @@ WHERE
 
 CREATE OR REPLACE VIEW v_cz_price_growth AS
 SELECT 
-	Year_price, 
-	ROUND(AVG(Difference),2) AS Difference 
+	year_price, 
+	ROUND(AVG(difference),2) AS difference 
 FROM 
 	v_cz_price_difference 
 GROUP BY 
-	Year_price;
+	year_price;
 
 CREATE OR REPLACE VIEW v_cz_payllor_growth AS
 SELECT 
-	Year_price, 
-	ROUND(AVG(Growth),2) AS Growth 
+	year_price, 
+	ROUND(AVG(growth),2) AS growth 
 FROM 
 	v_select_cz_payllor_growth 
 GROUP BY 
-	Year_price;
+	year_price;
 
 SELECT 
-	v_gdp.YEAR AS Basic_year,
-	v_gdp.YEAR + 1 AS Next_year,
+	v_gdp.year AS basic_year,
+	v_gdp.year + 1 AS next_year,
 	v_gdp.GDP_growth,
-	v_cz_p.Difference AS Price_growth,
-	v_cz_pay.Growth AS Pay_growth
+	v_cz_p.difference AS price_growth,
+	v_cz_pay.growth AS pay_growth
 FROM 
 	v_gdp_growth AS v_gdp
 LEFT JOIN v_cz_price_growth AS v_cz_p
-	ON v_gdp.`year`= v_cz_p.Year_price
+	ON v_gdp.`year`= v_cz_p.year_price
 LEFT JOIN v_cz_payllor_growth AS v_cz_pay
-	ON v_gdp.`year`= v_cz_pay.Year_price
-WHERE v_gdp.YEAR >= 2006 AND v_gdp.YEAR <= 2017 ;
+	ON v_gdp.`year`= v_cz_pay.year_price
+WHERE v_gdp.year >= 2006 AND v_gdp.year <= 2017 ;
 
 -- Z dat vyplývá, že výška HDP nemá přímý vliv na růst mezd nebo cen potravit.
