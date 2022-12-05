@@ -20,14 +20,14 @@ SELECT
 	Industry_branch,
 	Pay_value,
 	LEAD (Pay_value,1) OVER (PARTITION BY Industry_branch ORDER BY Industry_branch, Year_price) Next_pay_value,
-	round ((((LEAD (Pay_value,1) OVER (PARTITION BY Industry_branch ORDER BY Industry_branch, Year_price)) - Pay_value) / Pay_value) * 100,2) AS Growth
+	ROUND ((((LEAD (Pay_value,1) OVER (PARTITION BY Industry_branch ORDER BY Industry_branch, Year_price)) - Pay_value) / Pay_value) * 100,2) AS Growth
 FROM
 	v_select_cz_payllor
 ORDER BY Industry_branch,Year_price;
 
 SELECT
 	Industry_branch,
-	Round(AVG(Growth),2) AS Pay_growth
+	ROUND(AVG(Growth),2) AS Pay_growth
 FROM v_select_cz_payllor_growth
 WHERE Growth IS NOT NULL
 GROUP BY Industry_branch;
@@ -127,7 +127,7 @@ CREATE OR REPLACE VIEW v_gdp_growth AS
 SELECT 
 	*,
 	LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year) Next_year_GDP,
-	round((((LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year))-GDP) / GDP ) * 100,2) GDP_growth
+	ROUND((((LEAD (GDP,1) OVER (PARTITION BY country ORDER BY country, year))-GDP) / GDP ) * 100,2) GDP_growth
 FROM 
 	t_vojtech_kukac_project_SQL_secondary_final
 WHERE 
